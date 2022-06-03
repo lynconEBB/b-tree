@@ -8,11 +8,10 @@ TreeController *createTreeController(Memory* memory) {
     return treeController;
 }
 
-
 Node* createNode() {
     Node* node = malloc(sizeof(Node));
     node->size = 0;
-    for (int i = 0; i < DEGREE; i++) {
+    for (int i = 0; i < DEGREE + 1; i++) {
         node->children[i] = -1;
     }
     return node;
@@ -84,6 +83,8 @@ void insertKey(TreeController *this, int key, int ref) {
     Node* node;
     if (header->root == -1) {
         header->root = 0;
+        header->top++;
+        writeIndexHeader(this->memory, header);
         node = createNode();
         node->keys[0] = key;
         node->ref[0] = ref;
@@ -91,8 +92,10 @@ void insertKey(TreeController *this, int key, int ref) {
         writeNode(this->memory, node, 0);
     } else {
         node = insertAux(this,header->root, key, ref);
-
+        if (isOverflowed(node)) {
+        }
     }
+    free(node);
 }
 
 int isLeaf(Node *node) {

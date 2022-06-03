@@ -41,7 +41,8 @@ int requestOption(Option* op)
     return 1;
 }
 
-Professional* requestProfessional() {
+Professional* requestProfessional()
+{
     Professional* p = malloc(sizeof(Professional));
     printf("Insira os dados do profissional\n");
     printf("Codigo: ");
@@ -59,15 +60,18 @@ Professional* requestProfessional() {
     return p;
 }
 
-void insert(App* app) {
-    Professional* professional = requestProfessional();
-    int index = insertProfessional(app->professionalController, professional);
-    insertKey(app->treeController, professional->code, index);
+void insert(App* app)
+{
+//    Professional* professional = requestProfessional();
+//    int index = insertProfessional(app->professionalController, professional);
+    insertKey(app->treeController, 32, 3);
+    insertKey(app->treeController, 33, 5);
     printf("Profissional inserido com sucesso!\n");
-    free(professional);
+//    free(professional);
 }
 
-void executeOption(App* app, Option op) {
+void executeOption(App* app, Option op)
+{
     switch (op) {
         case OP_INSERT:
             insert(app);
@@ -97,7 +101,7 @@ void executeOption(App* app, Option op) {
 
 void printDatafile(FILE* file) {
     DataHeader* h = readDataHeader(file);
-    printf("Topo => %d| Livre => %d\n",h->top,h->free);
+    printf("Topo => %d | Livre => %d\n",h->top,h->free);
     Professional* p = malloc(sizeof(Professional));
     while (fread(p,sizeof(Professional), 1, file)) {
         printf("Codigo => %d\n", p->code);
