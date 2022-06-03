@@ -32,8 +32,14 @@ IndexHeader* readIndexHeader(Memory* memory);
 
 Professional* readProfessional(Memory* memory, int pos);
 
+Node* readNode(Memory* memory, int pos);
+
 void writeProfessional(Memory* file, Professional* professional, int pos);
 
+void writeNode(Memory* memory, Node* node, int pos);
+
 int getFreePositionsDataHeader(Memory* memory);
+
+int getFreePositionsIndexHeader(Memory* memory);
 
 #endif

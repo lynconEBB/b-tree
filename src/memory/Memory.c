@@ -46,6 +46,7 @@ int getFreePositionsDataHeader(Memory* memory) {
 
     int freeCount = 0;
     int freePos = header->free;
+    free(header);
     while (freePos != -1) {
         Professional* pro = readProfessional(memory,freePos);
         freePos = pro->code;
@@ -53,5 +54,53 @@ int getFreePositionsDataHeader(Memory* memory) {
         freeCount++;
     }
     return freeCount;
-    printf("O arquivo de dados possui %d posicoes livres\n", freeCount);
+}
+
+void writeIndexHeader(Memory *memory, IndexHeader *header) {
+    fseek(memory->indexFile, 0, SEEK_SET);
+    fwrite(header, sizeof(IndexHeader), 1, memory->indexFile);
+}
+
+IndexHeader *readIndexHeader(Memory *memory) {
+    IndexHeader* header = malloc(sizeof(IndexHeader));
+    fseek(memory->indexFile,0, SEEK_SET);
+    int success = fread(header, sizeof(IndexHeader), 1, memory->indexFile);
+    if (!success) {
+        header->top = 0;
+        header->free = -1;
+        header->root = -1;
+        writeIndexHeader(memory, header);
+    }
+    return header;
+}
+
+Node *readNode(Memory *memory, int pos) {
+    Node* node = malloc(sizeof(Node));
+    fseek(memory->indexFile, sizeof(IndexHeader) + pos * sizeof(Node), SEEK_SET);
+    fread(node, sizeof(Node), 1, memory->indexFile);
+    return node;
+}
+
+void writeNode(Memory *memory, Node *node, int pos) {
+    fseek(memory->indexFile, sizeof(IndexHeader) + pos * sizeof(Node), SEEK_SET);
+    fwrite(node, sizeof(Node), 1, memory->indexFile);
+}
+
+int getFreePositionsIndexHeader(Memory *memory) {
+    IndexHeader * header = readIndexHeader(memory);
+    if (header->free == -1) {
+        printf("Nenhuma posicao livre no arquivo de dados");
+        return 0;
+    }
+
+    int freeCount = 0;
+    int freePos = header->free;
+    free(header);
+    while (freePos != -1) {
+        Node* node = readNode(memory,freePos);
+        freePos = node->size;
+        free(node);
+        freeCount++;
+    }
+    return freeCount;
 }
