@@ -14,4 +14,8 @@ void insertKey(TreeController* this, int key, int ref);
 
 int isLeaf(Node* node);
 
+void printByLevel(TreeController* this);
+
+void printAsc(TreeController* this);
+
 #endif

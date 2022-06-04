@@ -37,23 +37,22 @@ void writeProfessional(Memory* memory, Professional* professional, int pos) {
     fwrite(professional, sizeof(Professional), 1, memory->dataFile);
 }
 
-int getFreePositionsDataHeader(Memory* memory) {
+void printFreePositionsDataHeader(Memory* memory) {
     DataHeader* header = readDataHeader(memory);
     if (header->free == -1) {
         printf("Nenhuma posicao livre no arquivo de dados");
-        return 0;
+        return;
     }
 
-    int freeCount = 0;
     int freePos = header->free;
+    printf("Posições livres: %d ", freePos);
     free(header);
     while (freePos != -1) {
         Professional* pro = readProfessional(memory,freePos);
         freePos = pro->code;
+        printf("%d ", freePos);
         free(pro);
-        freeCount++;
     }
-    return freeCount;
 }
 
 void writeIndexHeader(Memory *memory, IndexHeader *header) {
@@ -86,21 +85,19 @@ void writeNode(Memory *memory, Node *node, int pos) {
     fwrite(node, sizeof(Node), 1, memory->indexFile);
 }
 
-int getFreePositionsIndexHeader(Memory *memory) {
+void printFreePositionsIndexHeader(Memory *memory) {
     IndexHeader * header = readIndexHeader(memory);
     if (header->free == -1) {
         printf("Nenhuma posicao livre no arquivo de dados");
-        return 0;
+        return;
     }
-
-    int freeCount = 0;
     int freePos = header->free;
+    printf("Posições livres: %d ", freePos);
     free(header);
     while (freePos != -1) {
         Node* node = readNode(memory,freePos);
         freePos = node->size;
+        printf("%d ", freePos);
         free(node);
-        freeCount++;
     }
-    return freeCount;
 }

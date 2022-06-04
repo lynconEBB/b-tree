@@ -60,15 +60,6 @@ Professional* requestProfessional()
     return p;
 }
 
-void insert(App* app)
-{
-//    Professional* professional = requestProfessional();
-//    int index = insertProfessional(app->professionalController, professional);
-    insertKey(app->treeController, 32, 3);
-    insertKey(app->treeController, 33, 5);
-    printf("Profissional inserido com sucesso!\n");
-//    free(professional);
-}
 
 void executeOption(App* app, Option op)
 {
@@ -87,12 +78,16 @@ void executeOption(App* app, Option op)
         case OP_PRINT:
             break;
         case OP_PRINT_ASC:
+            printAsc(app->treeController);
             break;
         case OP_PRINT_LVL:
+            printByLevel(app->treeController);
             break;
         case OP_FREE_DATA:
+            printFreePositionsDataHeader(app->treeController->memory);
             break;
         case OP_FREE_INDEX:
+            printFreePositionsIndexHeader(app->treeController->memory);
             break;
         case OP_EXIT:
             break;
@@ -110,6 +105,48 @@ void printDatafile(FILE* file) {
     free(p);
 }
 
+
+void printIndexFile(App* app) {
+    IndexHeader * h = readIndexHeader(app->treeController->memory);
+    printf("Topo => %d | Livre => %d | Raiz => %d\n", h->top, h->free, h->root);
+    printf("POS => %d ", h->root);
+    free(h);
+}
+
+
+void insert(App* app)
+{
+//    Professional* professional = requestProfessional();
+//    int index = insertProfessional(app->professionalController, professional);
+    insertKey(app->treeController, 32, 3);
+    insertKey(app->treeController, 33, 5);
+    insertKey(app->treeController, 12, 7);
+    insertKey(app->treeController, 11, 9);
+    insertKey(app->treeController, 30, 7);
+    insertKey(app->treeController, 80, 7);
+    insertKey(app->treeController, 82, 7);
+    insertKey(app->treeController, 91, 7);
+    insertKey(app->treeController, 4, 7);
+    insertKey(app->treeController, 23, 7);
+    insertKey(app->treeController, 1, 7);
+    insertKey(app->treeController, 23, 7);
+    insertKey(app->treeController, 14, 7);
+    insertKey(app->treeController, 75, 7);
+    insertKey(app->treeController, 63, 7);
+    insertKey(app->treeController, 23, 7);
+    insertKey(app->treeController, 10, 7);
+    insertKey(app->treeController, 45, 7);
+    insertKey(app->treeController, 6, 7);
+    insertKey(app->treeController, 65, 7);
+    insertKey(app->treeController, 64, 7);
+    insertKey(app->treeController, 18, 7);
+    insertKey(app->treeController, 7, 7);
+
+    printf("=====================\n");
+    printByLevel(app->treeController);
+    printf("=====================\n");
+//    free(professional);
+}
 void printMenu() {
     printf("\n1 - Cadastrar Profissional\n");
     printf("2 - Remover Profissional\n");
