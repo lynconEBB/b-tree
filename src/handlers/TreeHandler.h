@@ -1,14 +1,13 @@
-#ifndef BTREE_TREECONTROLLER_H
-#define BTREE_TREECONTROLLER_H
-#include "../memory/Memory.h"
-#include "../model/BTree.h"
+#ifndef BTREE_TREEHANDLER_H
+#define BTREE_TREEHANDLER_H
 #include "../model/Queue.h"
+#include "IndexHandler.h"
 
 typedef struct {
-    Memory* memory;
+    IndexHandler* indexHandler;
 } TreeHandler;
 
-TreeHandler* createTreeController(Memory* memory);
+TreeHandler* createTreeHandler(IndexHandler* indexHandler);
 
 void insertKey(TreeHandler* this, int key, int ref);
 
