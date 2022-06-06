@@ -57,18 +57,18 @@ IndexHeader* readIndexHeader(IndexHandler* this) {
 }
 void writeIndexHeader(IndexHandler* this) {
     fseek(this->file, 0, SEEK_SET);
-    fwrite(this->header, sizeof(IndexHandler), 1, this->file);
+    fwrite(this->header, sizeof(IndexHeader), 1, this->file);
 }
 
 Node* readNode(IndexHandler* this, int pos) {
     Node* node = malloc(sizeof(Node));
-    fseek(this->file, sizeof(IndexHeader) + pos * sizeof(Node), SEEK_SET);
+    fseek(this->file, sizeof(IndexHeader) + (pos * sizeof(Node)), SEEK_SET);
     fread(node, sizeof(Node), 1, this->file);
     return node;
 }
 
 void writeNode(IndexHandler* this, Node *node, int pos) {
-    fseek(this->file, sizeof(IndexHeader) + pos * sizeof(Node), SEEK_SET);
+    fseek(this->file, sizeof(IndexHeader) + (pos * sizeof(Node)), SEEK_SET);
     fwrite(node, sizeof(Node), 1, this->file);
 }
 

@@ -28,7 +28,7 @@ int isUnderflowed(Node *node) {
     return node->size < DEGREE / 2;
 }
 
-void aux_getReferencesAsc(TreeHandler *this, Queue *queue, int nodePos) {
+static void aux_getReferencesAsc(TreeHandler *this, Queue *queue, int nodePos) {
     if (nodePos != -1) {
         Node *node = readNode(this->indexHandler, nodePos);
         for (int i = 0; i < node->size; i++) {
@@ -47,7 +47,7 @@ Queue* getReferencesAsc(TreeHandler *this) {
     return ascRefs;
 }
 
-int aux_search(TreeHandler *this, int filePos, int key, int *pos) {
+static int aux_search(TreeHandler *this, int filePos, int key, int *pos) {
     if (filePos == -1)
         return -1;
     Node *node = readNode(this->indexHandler, filePos);
@@ -152,7 +152,7 @@ Node *insertAux(TreeHandler *this, int nodePos, int key, int ref) {
                 Node *newNode = split(aux, &medKey, &medRef);
                 int newRef = addNode(this->indexHandler, newNode);
                 addToRight(node, pos, medKey, medRef, newRef);
-                addNode(this->indexHandler, aux);
+                writeNode(this->indexHandler, aux,node->children[pos]);
                 free(newNode);
             }
             writeNode(this->indexHandler, aux, node->children[pos]);
@@ -188,8 +188,8 @@ void insertKey(TreeHandler *this, int key, int ref) {
             for (int i = (DEGREE / 2) + 1; i < DEGREE; i++)
                 node->children[i] = -1;
             newRoot->size = 1;
-            writeNode(this->indexHandler, node, header->root);
             int rootPos = addNode(this->indexHandler, newRoot);
+            writeNode(this->indexHandler, node, header->root);
             header->root = rootPos;
             writeIndexHeader(this->indexHandler);
         } else {
@@ -210,7 +210,7 @@ void removeFromNode(Node *node, int pos) {
 
 void getMaxKeyAndRef(TreeHandler *this, int nodePos, int *key, int *ref) {
     Node *node = readNode(this->indexHandler, nodePos);
-    int max;
+
     if (isLeaf(node)) {
         *key = node->keys[node->size - 1];
         *ref = node->ref[node->size - 1];
@@ -261,16 +261,17 @@ int borrowRight(TreeHandler *this, Node *parent, Node* underFlowed, int underPos
 }
 
 void mergeLeft(TreeHandler* this, Node* parent, Node* underFlowed, int underPos) {
-    Node* sibling = readNode(this->indexHandler, parent->children[underPos-1]);
+    Node* leftChild = readNode(this->indexHandler, parent->children[underPos - 1]);
 
-    addToLeft(underFlowed,0,parent->keys[underPos-1],parent->ref[underPos-1],sibling->children[sibling->size]);
+    addToLeft(underFlowed, 0, parent->keys[underPos-1], parent->ref[underPos-1], leftChild->children[leftChild->size]);
 
-    for (int i = sibling->size-1; i >= 0; i--) {
-        addToLeft(underFlowed,0,sibling->keys[i], sibling->ref[i],sibling->children[i]);
+    for (int i = leftChild->size - 1; i >= 0; i--) {
+        addToLeft(underFlowed, 0, leftChild->keys[i], leftChild->ref[i], leftChild->children[i]);
     }
-    removeNode(this->indexHandler,parent->children[underPos-1]);
+    removeNode(this->indexHandler, parent->children[underPos-1]);
+    parent->children[underPos-1] = parent->children[underPos];
     removeFromNode(parent,underPos-1);
-    free(sibling);
+    free(leftChild);
 }
 
 void mergeRight(TreeHandler* this, Node* parent, Node* underFlowed, int underPos) {

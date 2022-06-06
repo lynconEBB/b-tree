@@ -144,7 +144,6 @@ void insert(App *app, Professional* professional) {
     }
 }
 
-
 void removeOne(App *app, int code) {
     int ref = search(app->treeHandler, code);
     if (ref == -1) {
@@ -244,8 +243,8 @@ void load(App *app) {
                 }
                 int ref = search(app->treeHandler, professional->code);
                 if (ref == -1) {
-                    printf("Código nao encontrado no sistema para realizar atualizacao!\n");
-                    return;
+                    printf("Código %d nao encontrado no sistema para realizar atualizacao!\n", professional->code);
+                    break;
                 }
                 free(professional);
                 professional = readProfessional(app->dataHandler, ref);
@@ -308,7 +307,7 @@ void printByLevel(App *app) {
         if (pos != -1) {
             Node *node = readNode(app->indexHandler, pos);
             printNode(node);
-            for (int i = 0; node->children[i] != -1; i++) {
+            for (int i = 0; node->children[i] != -1 && i < DEGREE; i++) {
                 enqueue(queue, node->children[i]);
             }
             free(node);
@@ -327,8 +326,7 @@ void printProfessional(Professional* professional) {
     printf("CPF: %s\n", professional->cpf);
     printf("Numero de Registro: %s\n", professional->registryNumber);
     printf("Endereco: %s\n", professional->address);
-    printf("Telefone: %s\n", professional->phone);
-    printf("=======================================\n");
+    printf("Telefone: %s\n\n", professional->phone);
 }
 
 void printNode(Node *node) {
