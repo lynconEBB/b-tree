@@ -3,6 +3,9 @@
 #include <stdio.h>
 #include <string.h>
 
+// Cria uma instancia da aplicação
+// Pré-condição: Nenhuma
+// Pós-condição: Instancia valida da aplicação
 App *createApp() {
     App *app = malloc(sizeof(App));
     app->dataHandler = createDataHandler();
@@ -11,6 +14,9 @@ App *createApp() {
     return app;
 }
 
+// Funçao auxiliar para remover espaços do começo e fim de uma string
+// Pré-condição: Ponteiro para string
+// Pós-condição: Retorna novo ponteiro para string sem espaços
 static char* aux_trim(char *str)
 {
     while(*str == ' ')
@@ -27,6 +33,9 @@ static char* aux_trim(char *str)
     return str;
 }
 
+// Limpa buffer padrao de entrada
+// Pré-condição: Nenhuma
+// Pós-condição: Buffer de entrada limpo
 static void aux_flushBuffer() {
     int ch;
     do {
@@ -34,6 +43,9 @@ static void aux_flushBuffer() {
     } while (ch != EOF && ch != '\n');
 }
 
+// Funçao auxiliar para ler uma linha do stdin dinamicamente
+// Pré-condição: Nenhuma
+// Pós-condição: Ponteiro para string dinamica contendo a linha inserida
 static char* aux_readLine()
 {
     char tmp[100], *str = NULL;
@@ -56,6 +68,9 @@ static char* aux_readLine()
     return str;
 }
 
+// Requisita opcao ao usuário
+// Pré-condição: Ponteiro para instancia valida do app
+// Pós-condição: Opcao do app preenchida com opçao lida do usuário
 int requestOption(App *app) {
     if (scanf("%u%*c", &app->option) != 1) {
         aux_flushBuffer();
@@ -64,6 +79,9 @@ int requestOption(App *app) {
     return 1;
 }
 
+// Inicia o loop do programa
+// Pré-condição: Ponteiro para instancia valida do app
+// Pós-condição: Nenhuma
 void startApp(App *app) {
     do {
         printMenu();
@@ -73,6 +91,9 @@ void startApp(App *app) {
     } while (app->option != OP_EXIT);
 }
 
+// Executa a opção presente no app
+// Pré-condição: Ponteiro para instancia valida do app
+// Pós-condição: Opcao executada caso encontrada
 void executeOption(App *app) {
     switch (app->option) {
         case OP_INSERT: {
@@ -115,6 +136,9 @@ void executeOption(App *app) {
     }
 }
 
+// Requisita as informaçẽes necessárias de um profissional
+// Pré-condição: Nenhuma
+// Pós-condição: Retorna profissional com informacoes fornecidas
 Professional *requestProfessional() {
     Professional *p = malloc(sizeof(Professional));
     printf("Insira os dados do profissional\n");
@@ -122,17 +146,25 @@ Professional *requestProfessional() {
     scanf("%d%*c", &p->code);
     printf("Nome: ");
     fgets(p->name, 51, stdin);
+    p->name[strcspn(p->name,"\n")] = '\0';
     printf("CPF: ");
     fgets(p->cpf, 12, stdin);
+    p->cpf[strcspn(p->cpf,"\n")] = '\0';
     printf("Numero de Registro: ");
     fgets(p->registryNumber, 31, stdin);
+    p->registryNumber[strcspn(p->registryNumber,"\n")] = '\0';
     printf("Endereco: ");
     fgets(p->address, 101, stdin);
+    p->address[strcspn(p->address,"\n")] = '\0';
     printf("Telefone: ");
     fgets(p->phone, 30, stdin);
+    p->phone[strcspn(p->phone,"\n")] = '\0';
     return p;
 }
 
+// Insere o profissional fornecido, salvando no arquivo de memória
+// Pré-condição: Ponteiro para instancia valida do app e ponteiro válido para profissional
+// Pós-condição: Profissional inserido caso código não exista no sistema
 void insert(App *app, Professional* professional) {
     int pos = search(app->treeHandler, professional->code);
     if (pos != -1) {
@@ -144,6 +176,9 @@ void insert(App *app, Professional* professional) {
     }
 }
 
+// Remove o profissional com o código fornecido
+// Pré-condição: Ponteiro para instancia valida do app
+// Pós-condição: Profissional removido caso código seja encontrado
 void removeOne(App *app, int code) {
     int ref = search(app->treeHandler, code);
     if (ref == -1) {
@@ -155,6 +190,10 @@ void removeOne(App *app, int code) {
     printf("Profissional removido com sucesso!\n");
 }
 
+// Requisita um código para o usuário e atualiza o profissional com
+// com este código usando endereço e telefone fornecidos pleo usuário
+// Pré-condição: Ponteiro para instancia valida do app
+// Pós-condição: Informaçoes do profissional atualizadas caso código seja encontrado
 void update(App *app) {
     printf("Insira o código do profissional:");
     int code;
@@ -183,7 +222,9 @@ void update(App *app) {
     printf("Profissional atualizado com sucesso!\n");
 }
 
-
+// Requisita um caminho para arquivo e o abre
+// Pré-condição: Nenhuma
+// Pós-condição: Ponteiro para arquivo aberto em modo de leitura
 FILE* requestFile() {
     printf("Insira o arquivo:");
     FILE* file;
@@ -200,7 +241,10 @@ FILE* requestFile() {
     return file;
 }
 
-
+// Requeista e lê arquivo contendo operações executando-as
+// linha a linha
+// Pré-condição: Ponteiro para instancia valida do app
+// Pós-condição: Nós criados, alterados ou removidos
 void load(App *app) {
     FILE* file = requestFile();
     char buffer[400];
@@ -225,6 +269,16 @@ void load(App *app) {
                     printf("Informacoes mal formatadas para processo de insercao!\n");
                     break;
                 }
+                char* aux = aux_trim(professional->name);
+                strcpy(professional->name, aux);
+                aux = aux_trim(professional->cpf);
+                strcpy(professional->cpf, aux);
+                aux = aux_trim(professional->registryNumber);
+                strcpy(professional->registryNumber, aux);
+                aux = aux_trim(professional->address);
+                strcpy(professional->address, aux);
+                aux = aux_trim(professional->phone);
+                strcpy(professional->phone, aux);
                 insert(app, professional);
             } break;
             case 'R': {
@@ -262,6 +316,10 @@ void load(App *app) {
     }
 }
 
+// Requisita um código ao usuário e busca esse código, caso seja encontrado
+// as informacoes sao apresentadas, caso contrario uma mensagem é apresentada
+// Pré-condição: Ponteiro para instancia valida do app
+// Pós-condição: Nenhuma
 void printProfessionalByCode(App *app) {
     printf("Insira o código do profissional:");
     int code;
@@ -279,6 +337,10 @@ void printProfessionalByCode(App *app) {
     free(professional);
 }
 
+// Imprime profissionais em ordem crescente, caso nenhum profssional seja encontrado
+// uma mensagem é apresentada
+// Pré-condição: Ponteiro para instancia valida do app
+// Pós-condição: Nenhuma
 void printAsc(App *app) {
     Queue *queue = getReferencesAsc(app->treeHandler);
     if (isEmpty(queue)) {
@@ -293,6 +355,9 @@ void printAsc(App *app) {
     free(queue);
 }
 
+// Imprime os nós por nivel
+// Pré-condição: Ponteiro para instancia valida do app
+// Pós-condição: Nenhuma
 void printByLevel(App *app) {
     IndexHeader *header = getIndexHeader(app->indexHandler);
     if (header->root == -1)
@@ -320,6 +385,9 @@ void printByLevel(App *app) {
     }
 }
 
+// Imprime as informações do profissional passado
+// Pré-condição: Ponteiro para profissional válido
+// Pós-condição: Nenhuma
 void printProfessional(Professional* professional) {
     printf("=========== Profissional %d ===========\n",professional->code );
     printf("Nome: %s\n", professional->name);
@@ -329,6 +397,9 @@ void printProfessional(Professional* professional) {
     printf("Telefone: %s\n\n", professional->phone);
 }
 
+// Imprime as chaves do nó passdo por parametro
+// Pré-condição: Ponteiro para nó valido
+// Pós-condição: Nenhuma
 void printNode(Node *node) {
     printf("[ ");
     for (int i = 0; i < node->size; i++) {
@@ -337,6 +408,9 @@ void printNode(Node *node) {
     printf("] ");
 }
 
+// Imprime o menu com as opçoes disponiveis
+// Pré-condição: Nenhuma
+// Pós-condição: Nenhuma
 void printMenu() {
     printf("\n1 - Cadastrar Profissional\n");
     printf("2 - Remover Profissional\n");

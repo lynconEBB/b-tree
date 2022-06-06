@@ -1,12 +1,18 @@
 #include "TreeHandler.h"
 #include <stdlib.h>
 
+// Cria um manipulador de arvore B recebendo um manipulador de indices
+// Pré-condição: Ponteiro para manipulador de arvore válido
+// Pós-condição: Manipulador de aruvore B retornado
 TreeHandler *createTreeHandler(IndexHandler* indexHandler) {
     TreeHandler *treeController = malloc(sizeof(TreeHandler));
     treeController->indexHandler = indexHandler;
     return treeController;
 }
 
+// Cria um nó vazio
+// Pré-condição: Nenhuma
+// Pós-condição: Ponteiro para nó sem filhos e com tamanho 0;
 Node *createNode() {
     Node *node = malloc(sizeof(Node));
     node->size = 0;
@@ -16,18 +22,30 @@ Node *createNode() {
     return node;
 }
 
+// Veritica se o nó fornecido é folha
+// Pré-condição: Ponteiro para manipulador de indices válido
+// Pós-condição: Nenhuma
 int isLeaf(Node *node) {
     return node->children[0] == -1;
 }
 
+// Verifica se o nó fornecido esta em overflow
+// Pré-condição: Ponteiro para nó válido
+// Pós-condição: Nenhuma
 int isOverflowed(Node *node) {
     return node->size == DEGREE;
 }
 
+// Verifica se o nó fornecido esta em underflow
+// Pré-condição: Ponteiro para nó válido
+// Pós-condição: Nenhuma
 int isUnderflowed(Node *node) {
     return node->size < DEGREE / 2;
 }
 
+// Função recursiva para percorrer a arvore em ordem adicionando suas referencias a fila
+// Pré-condição: Ponteiro para manipulador de arvore e fila válidos
+// Pós-condição: Fila preenchida com referencias em ordem
 static void aux_getReferencesAsc(TreeHandler *this, Queue *queue, int nodePos) {
     if (nodePos != -1) {
         Node *node = readNode(this->indexHandler, nodePos);
@@ -40,6 +58,9 @@ static void aux_getReferencesAsc(TreeHandler *this, Queue *queue, int nodePos) {
     }
 }
 
+// Fornece as referencias em ordem crescente
+// Pré-condição: Ponteiro para manipulador de arvore válido
+// Pós-condição: Retorna uma fila contendo as referencias
 Queue* getReferencesAsc(TreeHandler *this) {
     Queue *ascRefs = newQueue();
     IndexHeader *header = getIndexHeader(this->indexHandler);
@@ -47,6 +68,10 @@ Queue* getReferencesAsc(TreeHandler *this) {
     return ascRefs;
 }
 
+// Função recursiva para encontrar a referencia da chave passada
+// Pré-condição: Ponteiro para manipulador de arvore
+// Pós-condição: Retorna o numero da referencia da chave caso seja encontrada,
+// caso contrario, -1 é retornado
 static int aux_search(TreeHandler *this, int filePos, int key, int *pos) {
     if (filePos == -1)
         return -1;
@@ -62,6 +87,10 @@ static int aux_search(TreeHandler *this, int filePos, int key, int *pos) {
     return filePos;
 }
 
+// Procura a referencia da chave fornecida na arvore B
+// Pré-condição: Ponteiro para manipulador de arvore válido
+// Pós-condição: Retorna a referencia da chave, caso não seja encontrada,
+// -1 é retornado
 int search(TreeHandler *this, int key) {
     int pos, ref;
     IndexHeader *header = getIndexHeader(this->indexHandler);
@@ -76,14 +105,12 @@ int search(TreeHandler *this, int key) {
         ref = node->ref[pos];
         free(node);
     }
-
     return ref;
 }
 
-/**
- * Busca a posicao em que a chave esta ou estaria no nó
- * Retorna 1 se a chave esta presente e 0 caso contrario
- */
+// Busca a posicao em que a chave esta ou estaria no nó
+// Pré-condição: Ponteiro para nó valido
+// Pós-condição: Retorna 1 caso chave esteja no nó e 0 caso contrario
 int searchKeyPosition(Node *node, int key, int *pos) {
     for ((*pos) = 0; (*pos) < node->size; (*pos)++) {
         if (key == node->keys[(*pos)])
@@ -94,7 +121,10 @@ int searchKeyPosition(Node *node, int key, int *pos) {
     return 0;
 }
 
-
+// Adiciona a chave e referencia posição fornecida no nó fornecido, adicionando
+// o filho fornecio a direita
+// Pré-condição: Ponteiro para nó valido
+// Pós-condição: Nó modificado
 void addToRight(Node *node, int pos, int key, int ref, int rightChild) {
     for (int i = node->size; i > pos; i--) {
         node->keys[i] = node->keys[i - 1];
@@ -107,6 +137,10 @@ void addToRight(Node *node, int pos, int key, int ref, int rightChild) {
     node->size++;
 }
 
+// Adiciona a chave e referencia posição fornecida no nó fornecido, adicionando
+// o filho fornecio a esquerda
+// Pré-condição: Ponteiro para nó valido
+// Pós-condição: Nó modificado
 void addToLeft(Node *node, int pos, int key, int ref, int leftChild) {
     for (int i = node->size; i > pos; i--) {
         node->keys[i] = node->keys[i - 1];
@@ -120,7 +154,10 @@ void addToLeft(Node *node, int pos, int key, int ref, int leftChild) {
     node->size++;
 }
 
-
+// Cria novo nó a partir de metade das chaves e referencias do nó fornecido
+// Pré-condição: Ponteiro para nó valido
+// Pós-condição: Modifica o nó em overflow e retorna a chave e referencia mediana
+// e o novo nó
 Node *split(Node *overNode, int *medKey, int *medRef) {
     Node *newNode = createNode();
     int q = overNode->size / 2;
@@ -137,8 +174,11 @@ Node *split(Node *overNode, int *medKey, int *medRef) {
     return newNode;
 }
 
-
-Node *insertAux(TreeHandler *this, int nodePos, int key, int ref) {
+// Função recursiva para inserir chave na arvore B, busca a posicao de insercao e
+// corrige nós em overflow
+// Pré-condição: Ponteiro para manipulador de arvore válido
+// Pós-condição: Retorna o nó da posição fornecida com as modificações necessárias
+Node *aux_insert(TreeHandler *this, int nodePos, int key, int ref) {
     int pos;
     Node *node = readNode(this->indexHandler, nodePos);
 
@@ -146,7 +186,7 @@ Node *insertAux(TreeHandler *this, int nodePos, int key, int ref) {
         if (isLeaf(node)) {
             addToRight(node, pos, key, ref, -1);
         } else {
-            Node *aux = insertAux(this, node->children[pos], key, ref);
+            Node *aux = aux_insert(this, node->children[pos], key, ref);
             if (isOverflowed(aux)) {
                 int medKey, medRef;
                 Node *newNode = split(aux, &medKey, &medRef);
@@ -162,6 +202,10 @@ Node *insertAux(TreeHandler *this, int nodePos, int key, int ref) {
     return node;
 }
 
+// Insere uma chave e uma referencia na arvore B realizando as devidas
+// correçoes caso o nó fiquem em overflow
+// Pré-condição: Ponteiro para manipulador de arvore válido
+// Pós-condição: Chave e referencia adicionadas
 void insertKey(TreeHandler *this, int key, int ref) {
     IndexHeader *header = getIndexHeader(this->indexHandler);
     Node *node;
@@ -175,7 +219,7 @@ void insertKey(TreeHandler *this, int key, int ref) {
         node->size++;
         writeNode(this->indexHandler, node, 0);
     } else {
-        node = insertAux(this, header->root, key, ref);
+        node = aux_insert(this, header->root, key, ref);
         if (isOverflowed(node)) {
             int medKey, medRef;
             Node *aux = split(node, &medKey, &medRef);
@@ -199,6 +243,9 @@ void insertKey(TreeHandler *this, int key, int ref) {
     free(node);
 }
 
+// Remove a chave e referencia na posição fornecida do nó fornecido
+// Pré-condição: Ponteiro para nó valido
+// Pós-condição: Nó modificado
 void removeFromNode(Node *node, int pos) {
     for (int i = pos; i < node->size; i++) {
         node->keys[i] = node->keys[i + 1];
@@ -208,6 +255,10 @@ void removeFromNode(Node *node, int pos) {
     node->size--;
 }
 
+// Funçao recursiva para encontrar a maior chave e referencia a partir da posiçao
+// no arquivo de um no
+// Pré-condição: Ponteiro para manipulador de arvore válido
+// Pós-condição: Nenhuma
 void getMaxKeyAndRef(TreeHandler *this, int nodePos, int *key, int *ref) {
     Node *node = readNode(this->indexHandler, nodePos);
 
@@ -222,6 +273,9 @@ void getMaxKeyAndRef(TreeHandler *this, int nodePos, int *key, int *ref) {
     }
 }
 
+// Empresta uma chave do no esquerdo ao no em underflow
+// Pré-condição: Ponteiro para manipulador de arvore e nos válidos
+// Pós-condição: Retorna 1 caso obteha sucesso e 0 caso contrario
 int borrowLeft(TreeHandler *this, Node *parent, Node* underFlowed, int underPos) {
     if (underPos - 1 < 0)
         return 0;
@@ -241,6 +295,9 @@ int borrowLeft(TreeHandler *this, Node *parent, Node* underFlowed, int underPos)
     return 1;
 }
 
+// Empresta uma chave do no direito ao no em underflow
+// Pré-condição: Ponteiro para manipulador de arvore e nos válidos
+// Pós-condição: Retorna 1 caso obteha sucesso e 0 caso contrario
 int borrowRight(TreeHandler *this, Node *parent, Node* underFlowed, int underPos) {
     Node *rightChild = readNode(this->indexHandler, parent->children[underPos + 1]);
     if (rightChild->size <= DEGREE / 2){
@@ -260,6 +317,10 @@ int borrowRight(TreeHandler *this, Node *parent, Node* underFlowed, int underPos
     return 1;
 }
 
+// Adiciona chaves e referencias do no adjacente esquerdo e do no pai ao
+// no em underflow, removendo o no adjacente esquerdo
+// Pré-condição: Ponteiro para manipulador de arvore e nos válidos
+// Pós-condição: No adjacente esquerdo removido e nos com underflow e pai modificados
 void mergeLeft(TreeHandler* this, Node* parent, Node* underFlowed, int underPos) {
     Node* leftChild = readNode(this->indexHandler, parent->children[underPos - 1]);
 
@@ -274,6 +335,10 @@ void mergeLeft(TreeHandler* this, Node* parent, Node* underFlowed, int underPos)
     free(leftChild);
 }
 
+// Adiciona chaves e referencias do no adjacente direito e do no pai ao
+// no em underflow, removendo o no adjacente direito
+// Pré-condição: Ponteiro para manipulador de arvore e nos válidos
+// Pós-condição: No adjacente direito removido e nos com underflow e pai modificados
 void mergeRight(TreeHandler* this, Node* parent, Node* underFlowed, int underPos) {
     Node* sibling = readNode(this->indexHandler, parent->children[underPos+1]);
 
@@ -290,7 +355,11 @@ void mergeRight(TreeHandler* this, Node* parent, Node* underFlowed, int underPos
     free(sibling);
 }
 
-Node *aux_remove(TreeHandler *this, int key, int nodePos) {
+// Função recursiva para remover chave na arvore B, busca a posicao de remocao e
+// corrige nós em underflow
+// Pré-condição: Ponteiro para manipulador de arvore válido
+// Pós-condição: Retorna o nó da posição fornecida com as modificações necessárias
+Node* aux_remove(TreeHandler *this, int key, int nodePos) {
     Node *node = readNode(this->indexHandler, nodePos);
     int keyIndex;
     int find = searchKeyPosition(node, key, &keyIndex);
@@ -323,6 +392,10 @@ Node *aux_remove(TreeHandler *this, int key, int nodePos) {
     return node;
 }
 
+// Remove uma chave da arvore B realizando as devidas correçoes
+// caso o nó fique em underflow
+// Pré-condição: Ponteiro para manipulador de arvore válido
+// Pós-condição: Chave removida da arvore
 void removeKey(TreeHandler *this, int key) {
     IndexHeader *header = getIndexHeader(this->indexHandler);
 
