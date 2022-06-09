@@ -1,4 +1,4 @@
-#include "src/view/App.h"
+#include "view/App.h"
 
 //Funcão principal
 int main() {

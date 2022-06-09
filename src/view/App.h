@@ -31,6 +31,11 @@ typedef struct{
 // Pós-condição: Instancia valida da aplicação
 App* createApp();
 
+// Libera memoria utilizada pela aplicação
+// Pré-condição: Ponteiro para aplicação valido
+// Pós-condição: Aplicação destruida, ponteiro invalidado
+void destroyApp(App* app);
+
 // Inicia o loop do programa
 // Pré-condição: Ponteiro para instancia valida do app
 // Pós-condição: Nenhuma

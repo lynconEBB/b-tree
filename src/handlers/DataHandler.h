@@ -6,7 +6,7 @@
 typedef struct {
     int code;
     char name[51];
-    char cpf[12];
+    char cpf[13];
     char registryNumber[31];
     char address[101];
     char phone[20];
@@ -30,6 +30,11 @@ typedef struct {
 // Pré-condição: Nenhuma
 // Pós-condição: Ponteiro válido para um manipulador de dados
 DataHandler* createDataHandler();
+
+// Liber memoria utilizada pelo manipulador de dados e fecha arquivo utilizado
+// Pré-condição: Ponteiro para manipulador de dados valido
+// Pós-condição: Manipulador de dados invalidado
+void freeDataHandler(DataHandler* this);
 
 // Adiciona novo profissional ao arquivo de dados, caso nenhuma posiçao livre exista
 // o profissional é adicionado no topo do arquivo, caso contrario a posicao livre é utilizada

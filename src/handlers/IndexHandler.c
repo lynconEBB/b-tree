@@ -18,6 +18,15 @@ IndexHandler *createIndexHandler() {
     return this;
 }
 
+// Liber memoria utilizada pelo manipulador de indices e fecha arquivo utilizado
+// Pré-condição: Ponteiro para manipulador de indices valido e ponteiro para profissional
+// Pós-condição: Manipulador de indices invalidado
+void freeIndexHandler(IndexHandler *this) {
+    fclose(this->file);
+    free(this->header);
+    free(this);
+}
+
 // Adiciona novo nó ao arquivo de indices, caso nenhuma posiçao livre exista
 // o nó é adicionado no topo do arquivo, caso contrario a posicao livre é utilizada
 // Pré-condição: Ponteiro para manipulador de indices valido e ponteiro para nó
@@ -114,7 +123,8 @@ void printFreePositionsIndexHeader(IndexHandler* this) {
     while (freePos != -1) {
         Node* node = readNode(this,freePos);
         freePos = node->size;
-        printf("%d ", freePos);
+        if (freePos != -1)
+            printf("%d ", freePos);
         free(node);
     }
 }

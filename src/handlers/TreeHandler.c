@@ -10,6 +10,14 @@ TreeHandler *createTreeHandler(IndexHandler* indexHandler) {
     return treeController;
 }
 
+// Libera a memoria utilizada pelo manipulador de arvore
+// Pré-condição: Ponteiro para manipulador de arvore valido
+// Pós-condição: Manipulador de avore invalidado
+void freeTreeHandler(TreeHandler* treeHandler){
+    freeIndexHandler(treeHandler->indexHandler);
+    free(treeHandler);
+}
+
 // Cria um nó vazio
 // Pré-condição: Nenhuma
 // Pós-condição: Ponteiro para nó sem filhos e com tamanho 0;

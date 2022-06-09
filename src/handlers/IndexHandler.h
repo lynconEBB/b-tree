@@ -33,6 +33,11 @@ typedef struct {
 // Pós-condição: Ponteiro válido para um manipulador de indices
 IndexHandler* createIndexHandler();
 
+// Liber memoria utilizada pelo manipulador de indices e fecha arquivo utilizado
+// Pré-condição: Ponteiro para manipulador de indices valido e ponteiro para profissional
+// Pós-condição: Manipulador de indices invalidado
+void freeIndexHandler(IndexHandler *this);
+
 // Escreve o cabeçalho atual no arquivo de indices
 // Pré-condição: Ponteiro para manipulador de indices valido
 // Pós-condição: Cabeçalho salvo no arquivo

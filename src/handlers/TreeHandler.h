@@ -19,6 +19,11 @@ Node *createNode();
 // Pós-condição: Manipulador de aruvore B retornado
 TreeHandler* createTreeHandler(IndexHandler* indexHandler);
 
+// Libera memoria utilizada pelo manipulador de arvore
+// Pré-condição: Ponteiro para manipulador de arvore valido
+// Pós-condição: Manipulador de avore invalidado
+void freeTreeHandler(TreeHandler* treeHandler);
+
 // Insere uma chave e uma referencia na arvore B realizando as devidas
 // correçoes caso o nó fiquem em overflow
 // Pré-condição: Ponteiro para manipulador de arvore válido

@@ -14,6 +14,15 @@ App *createApp() {
     return app;
 }
 
+// Libera memoria utilizada pela aplicação
+// Pré-condição: Ponteiro para aplicação valido
+// Pós-condição: Aplicação destruida, ponteiro invalidado
+void destroyApp(App* app) {
+    freeDataHandler(app->dataHandler);
+    freeTreeHandler(app->treeHandler);
+    free(app);
+}
+
 // Funçao auxiliar para remover espaços do começo e fim de uma string
 // Pré-condição: Ponteiro para string
 // Pós-condição: Retorna novo ponteiro para string sem espaços
@@ -148,7 +157,7 @@ Professional *requestProfessional() {
     fgets(p->name, 51, stdin);
     p->name[strcspn(p->name,"\n")] = '\0';
     printf("CPF: ");
-    fgets(p->cpf, 12, stdin);
+    fgets(p->cpf, 13, stdin);
     p->cpf[strcspn(p->cpf,"\n")] = '\0';
     printf("Numero de Registro: ");
     fgets(p->registryNumber, 31, stdin);
@@ -360,8 +369,11 @@ void printAsc(App *app) {
 // Pós-condição: Nenhuma
 void printByLevel(App *app) {
     IndexHeader *header = getIndexHeader(app->indexHandler);
-    if (header->root == -1)
+    if (header->root == -1) {
+        printf("Nenhum dado encontrado no sistema!\n");
         return;
+    }
+
 
     Queue *queue = newQueue();
     enqueue(queue, header->root);
@@ -372,7 +384,7 @@ void printByLevel(App *app) {
         if (pos != -1) {
             Node *node = readNode(app->indexHandler, pos);
             printNode(node);
-            for (int i = 0; node->children[i] != -1 && i < DEGREE; i++) {
+            for (int i = 0; node->children[i] != -1 && i < DEGREE - 1; i++) {
                 enqueue(queue, node->children[i]);
             }
             free(node);

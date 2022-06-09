@@ -18,6 +18,16 @@ DataHandler *createDataHandler() {
     return this;
 }
 
+
+// Liber memoria utilizada pelo manipulador de dados e fecha arquivo utilizado
+// Pré-condição: Ponteiro para manipulador de dados valido
+// Pós-condição: Manipulador de dados invalidado
+void freeDataHandler(DataHandler *this) {
+    fclose(this->file);
+    free(this->header);
+    free(this);
+}
+
 // Adiciona novo profissional ao arquivo de dados, caso nenhuma posiçao livre exista
 // o profissional é adicionado no topo do arquivo, caso contrario a posicao livre é utilizada
 // Pré-condição: Ponteiro para manipulador de dados valido e ponteiro para profissional
@@ -112,10 +122,11 @@ void printFreePositionsDataHeader(DataHandler* this) {
 
     int freePos = this->header->free;
     printf("Posições livres: %d ", freePos);
-    while (freePos != -1) {
+    do {
         Professional* pro = readProfessional(this,freePos);
         freePos = pro->code;
-        printf("%d ", freePos);
+        if (freePos != -1)
+            printf("%d ", freePos);
         free(pro);
-    }
+    } while (freePos != -1);
 }
