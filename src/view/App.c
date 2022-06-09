@@ -99,6 +99,23 @@ void startApp(App *app) {
         executeOption(app);
     } while (app->option != OP_EXIT);
 }
+void axu(App* app) {
+    for (int i = 0; i < app->indexHandler->header->top; i++) {
+
+        printf("Nó %d\n", i);
+        Node* node = readNode(app->indexHandler,i);
+        printf("[ ");
+        for(int ii = 0; ii < node->size; ii++){
+            printf("%d ", node->keys[ii]);
+        }
+        printf("]\n");
+        printf("[ ");
+        for(int ii = 0; ii <= node->size; ii++){
+            printf("%d ", node->children[ii]);
+        }
+        printf("]\n");
+    }
+}
 
 // Executa a opção presente no app
 // Pré-condição: Ponteiro para instancia valida do app
@@ -135,7 +152,8 @@ void executeOption(App *app) {
             printByLevel(app);
             break;
         case OP_FREE_DATA:
-            printFreePositionsDataHeader(app->dataHandler);
+            axu(app);
+            //printFreePositionsDataHeader(app->dataHandler);
             break;
         case OP_FREE_INDEX:
             printFreePositionsIndexHeader(app->indexHandler);
@@ -373,7 +391,6 @@ void printByLevel(App *app) {
         printf("Nenhum dado encontrado no sistema!\n");
         return;
     }
-
 
     Queue *queue = newQueue();
     enqueue(queue, header->root);
